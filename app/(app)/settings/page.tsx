@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { User, Clock, Bell, Heart, LogOut } from "lucide-react";
 
 export default function SettingsPage() {
-  const { name, wakeUpTime, pushEnabled, setUser, updateSettings } =
+  const { pushEnabled, setUser, updateSettings } =
     useUserStore();
   const [loading, setLoading] = useState(true);
   const [editName, setEditName] = useState("");

@@ -19,7 +19,7 @@ interface UserState {
   }) => void;
 }
 
-export const useUserStore = create<UserState>((set, get) => ({
+export const useUserStore = create<UserState>((set) => ({
   name: null,
   email: null,
   wakeUpTime: "06:00",

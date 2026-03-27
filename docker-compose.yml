@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: bp_reversal
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgresql://postgres:postgres@db:5432/bp_reversal"
+      NEXTAUTH_URL: "http://localhost:3000"
+      NEXTAUTH_SECRET: "docker-dev-secret-change-in-production"
+      RESEND_API_KEY: "${RESEND_API_KEY:-re_placeholder}"
+      EMAIL_FROM: "BP Reversal <noreply@bpreversal.com>"
+      NEXT_PUBLIC_VAPID_PUBLIC_KEY: "${NEXT_PUBLIC_VAPID_PUBLIC_KEY:-placeholder}"
+      VAPID_PRIVATE_KEY: "${VAPID_PRIVATE_KEY:-placeholder}"
+      CRON_SECRET: "docker-cron-secret"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
