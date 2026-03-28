@@ -44,6 +44,22 @@ jobs:
       - run: npm run test
       - run: npm run test:coverage
 
+  e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: [lint, typecheck, test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+        env:
+          E2E_BASE_URL: https://bp-reversal.vercel.app
+
   build:
     name: Build
     runs-on: ubuntu-latest
