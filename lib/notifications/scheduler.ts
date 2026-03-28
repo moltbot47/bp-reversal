@@ -26,7 +26,7 @@ export function getTimeBlockForUser(
   for (let i = blocks.length - 1; i >= 0; i--) {
     const blockStart =
       wakeMinutes + TIME_BLOCK_OFFSETS[blocks[i]] * 60;
-    if (currentMinutes >= blockStart && currentMinutes < blockStart + 15) {
+    if (currentMinutes >= blockStart && currentMinutes < blockStart + 20) {
       return blocks[i];
     }
   }

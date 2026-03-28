@@ -76,22 +76,28 @@ describe("getBPCategory", () => {
     expect(cat.label).toBe("Elevated");
   });
 
-  it("returns Stage 1 for 130-139 or 80-89", () => {
+  it("returns Stage 1 for 130-139 and <90", () => {
     expect(getBPCategory(135, 85).label).toBe("Stage 1");
-    expect(getBPCategory(125, 85).label).toBe("Stage 1");
+    expect(getBPCategory(130, 85).label).toBe("Stage 1");
   });
 
   it("returns Stage 2 for >=140 or >=90", () => {
     expect(getBPCategory(145, 95).label).toBe("Stage 2");
     expect(getBPCategory(150, 100).label).toBe("Stage 2");
+    expect(getBPCategory(180, 70).label).toBe("Stage 2"); // High systolic, normal diastolic
+    expect(getBPCategory(125, 95).label).toBe("Stage 2"); // Normal systolic, high diastolic
   });
 
   it("boundary: exactly 120/80 is Elevated", () => {
     expect(getBPCategory(120, 75).label).toBe("Elevated");
   });
 
-  it("boundary: exactly 130/80 is Stage 1", () => {
+  it("boundary: 130/80 is Stage 1 (both below Stage 2 thresholds)", () => {
     expect(getBPCategory(130, 80).label).toBe("Stage 1");
+  });
+
+  it("boundary: 130/90 is Stage 2 (diastolic at threshold)", () => {
+    expect(getBPCategory(130, 90).label).toBe("Stage 2");
   });
 });
 

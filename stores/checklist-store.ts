@@ -35,6 +35,8 @@ export const useChecklistStore = create<ChecklistState>((set, get) => ({
     if (!item || item.locked) return;
 
     const newCompleted = !item.completed;
+    // Snapshot before optimistic update for safe rollback
+    const snapshot = items;
 
     // Optimistic update
     set({
@@ -49,12 +51,8 @@ export const useChecklistStore = create<ChecklistState>((set, get) => ({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ slug, completed: newCompleted }),
     }).catch(() => {
-      // Rollback on error
-      set({
-        items: get().items.map((i) =>
-          i.slug === slug ? { ...i, completed: !newCompleted } : i
-        ),
-      });
+      // Rollback to snapshot on error
+      set({ items: snapshot });
     });
   },
 

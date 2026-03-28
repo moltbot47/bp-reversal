@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { parseJSON } from "@/lib/api-utils";
 
 export async function GET() {
   const session = await auth();
@@ -29,7 +30,9 @@ export async function PUT(request: NextRequest) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const data = await request.json();
+  const result = await parseJSON(request);
+  if ("error" in result) return result.error;
+  const data = result.data;
   const updateData: Record<string, unknown> = {};
 
   if (data.name !== undefined) updateData.name = data.name;

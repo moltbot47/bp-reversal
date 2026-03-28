@@ -16,8 +16,12 @@ export default function BPLogPage() {
 
   useEffect(() => {
     fetch("/api/bp-log")
-      .then((r) => r.json())
-      .then((data) => setEntries(data.entries));
+      .then((r) => {
+        if (!r.ok) throw new Error("Failed to load");
+        return r.json();
+      })
+      .then((data) => setEntries(data.entries))
+      .catch(() => setEntries([]));
   }, [setEntries]);
 
   const handleSubmit = async (entry: {
@@ -28,32 +32,37 @@ export default function BPLogPage() {
     notes?: string;
   }) => {
     setSubmitting(true);
-    const res = await fetch("/api/bp-log", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(entry),
-    });
-    const data = await res.json();
+    try {
+      const res = await fetch("/api/bp-log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(entry),
+      });
+      if (!res.ok) throw new Error("Failed to log reading");
+      const data = await res.json();
 
-    addEntry({
-      ...data.entry,
-      createdAt: data.entry.createdAt,
-    });
+      addEntry({
+        ...data.entry,
+        createdAt: data.entry.createdAt,
+      });
 
-    // Show milestone toasts
-    if (data.newMilestones?.length > 0) {
-      for (const m of data.newMilestones) {
-        addToast({
-          title: "Milestone reached!",
-          description: m.message,
-          variant: "celebration",
-        });
+      // Show milestone toasts
+      if (data.newMilestones?.length > 0) {
+        for (const m of data.newMilestones) {
+          addToast({
+            title: "Milestone reached!",
+            description: m.message,
+            variant: "celebration",
+          });
+        }
+      } else {
+        addToast({ title: "Reading logged", variant: "success" });
       }
-    } else {
-      addToast({ title: "Reading logged", variant: "success" });
+    } catch {
+      addToast({ title: "Failed to save. Try again.", variant: "default" });
+    } finally {
+      setSubmitting(false);
     }
-
-    setSubmitting(false);
   };
 
   if (loading) {

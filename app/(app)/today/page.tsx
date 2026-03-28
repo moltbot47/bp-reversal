@@ -22,10 +22,16 @@ export default function TodayPage() {
 
   useEffect(() => {
     fetch("/api/checklist")
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error("Failed to load");
+        return r.json();
+      })
       .then((data) => {
         setItems(data.items);
         setDayInfo(data.dayNumber, data.phase);
+      })
+      .catch(() => {
+        setItems([]);
       });
   }, [setItems, setDayInfo]);
 

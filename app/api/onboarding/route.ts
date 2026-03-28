@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { parseJSON } from "@/lib/api-utils";
 
 export async function POST(request: NextRequest) {
   const session = await auth();
@@ -8,8 +9,10 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { name, wakeUpTime } = await request.json();
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const result = await parseJSON<{ name: string; wakeUpTime: string; timezone?: string }>(request);
+  if ("error" in result) return result.error;
+  const { name, wakeUpTime, timezone: clientTimezone } = result.data;
+  const timezone = clientTimezone || "America/Chicago";
 
   await prisma.user.update({
     where: { id: session.user.id },

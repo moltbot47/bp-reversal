@@ -43,7 +43,13 @@ export async function GET(request: NextRequest) {
         },
       });
     } else if (wasActive) {
-      const newStreak = streak.currentStreak + 1;
+      // Check if last active was the day before yesterday (consecutive)
+      const dayBeforeYesterday = new Date(yesterday);
+      dayBeforeYesterday.setDate(dayBeforeYesterday.getDate() - 1);
+      const dayBeforeStr = dayBeforeYesterday.toISOString().split("T")[0];
+      const isConsecutive = streak.lastActiveDate === dayBeforeStr;
+
+      const newStreak = isConsecutive ? streak.currentStreak + 1 : 1;
       await prisma.streak.update({
         where: { userId: user.id },
         data: {

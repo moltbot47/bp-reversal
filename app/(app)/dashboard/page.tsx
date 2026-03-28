@@ -14,9 +14,15 @@ export default function DashboardPage() {
 
   useEffect(() => {
     fetch("/api/dashboard")
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error("Failed to load");
+        return r.json();
+      })
       .then((d) => {
         setData(d);
+        setLoading(false);
+      })
+      .catch(() => {
         setLoading(false);
       });
   }, []);

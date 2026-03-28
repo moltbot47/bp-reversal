@@ -19,7 +19,11 @@ export default function SignupPage() {
     await fetch("/api/onboarding", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, wakeUpTime }),
+      body: JSON.stringify({
+        name,
+        wakeUpTime,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      }),
     });
 
     // Request push permission
@@ -27,11 +31,13 @@ export default function SignupPage() {
       const permission = await Notification.requestPermission();
       if (permission === "granted") {
         try {
+          const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+          if (!vapidKey || vapidKey === "placeholder") throw new Error("No VAPID key");
           const reg = await navigator.serviceWorker.ready;
           const subscription = await reg.pushManager.subscribe({
-            userVisuallyInactive: true,
-            applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
-          } as PushSubscriptionOptionsInit);
+            userVisibleOnly: true,
+            applicationServerKey: vapidKey,
+          });
 
           await fetch("/api/push/subscribe", {
             method: "POST",

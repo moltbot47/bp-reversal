@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { parseJSON } from "@/lib/api-utils";
 import { getItemsWithStatus, getDayNumber, getCurrentPhase } from "@/lib/checklist/phases";
 
 export async function GET() {
@@ -35,7 +36,9 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { slug, completed } = await request.json();
+  const result = await parseJSON<{ slug: string; completed: boolean }>(request);
+  if ("error" in result) return result.error;
+  const { slug, completed } = result.data;
   const today = new Date().toISOString().split("T")[0];
 
   if (completed) {

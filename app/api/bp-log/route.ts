@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { parseJSON } from "@/lib/api-utils";
 import { checkMilestones } from "@/lib/bp/milestones";
 
 export async function GET() {
@@ -24,7 +25,9 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { systolic, diastolic, pulse, period, notes } = await request.json();
+  const result = await parseJSON<{ systolic: number; diastolic: number; pulse?: number; period: "AM" | "PM"; notes?: string }>(request);
+  if ("error" in result) return result.error;
+  const { systolic, diastolic, pulse, period, notes } = result.data;
   const today = new Date().toISOString().split("T")[0];
 
   const entry = await prisma.bPEntry.upsert({

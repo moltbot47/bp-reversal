@@ -17,11 +17,17 @@ export default function SettingsPage() {
 
   useEffect(() => {
     fetch("/api/reminders")
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error("Failed to load");
+        return r.json();
+      })
       .then((data) => {
         setUser(data);
         setEditName(data.name || "");
         setEditWakeTime(data.wakeUpTime || "06:00");
+        setLoading(false);
+      })
+      .catch(() => {
         setLoading(false);
       });
   }, [setUser]);
@@ -41,11 +47,12 @@ export default function SettingsPage() {
         if (permission === "granted") {
           try {
             const reg = await navigator.serviceWorker.ready;
+            const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+            if (!vapidKey || vapidKey === "placeholder") throw new Error("No VAPID key");
             const subscription = await reg.pushManager.subscribe({
-              userVisuallyInactive: true,
-              applicationServerKey:
-                process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
-            } as PushSubscriptionOptionsInit);
+              userVisibleOnly: true,
+              applicationServerKey: vapidKey,
+            });
 
             await fetch("/api/push/subscribe", {
               method: "POST",
