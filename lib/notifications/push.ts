@@ -1,20 +1,31 @@
 import webpush from "web-push";
 
-const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!;
-const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY!;
+let vapidConfigured = false;
 
-if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY && VAPID_PUBLIC_KEY !== "placeholder") {
-  webpush.setVapidDetails(
-    "mailto:noreply@bpreversal.com",
-    VAPID_PUBLIC_KEY,
-    VAPID_PRIVATE_KEY
-  );
+function ensureVapidConfigured() {
+  if (vapidConfigured) return true;
+  const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+  const privateKey = process.env.VAPID_PRIVATE_KEY;
+  if (!publicKey || !privateKey || publicKey === "placeholder") return false;
+  try {
+    webpush.setVapidDetails(
+      "mailto:noreply@bpreversal.com",
+      publicKey,
+      privateKey
+    );
+    vapidConfigured = true;
+    return true;
+  } catch {
+    console.error("Failed to configure VAPID keys");
+    return false;
+  }
 }
 
 export async function sendPushNotification(
   subscription: webpush.PushSubscription,
   payload: { title: string; body: string; icon?: string; url?: string }
 ): Promise<boolean> {
+  if (!ensureVapidConfigured()) return false;
   try {
     await webpush.sendNotification(
       subscription,
@@ -24,7 +35,7 @@ export async function sendPushNotification(
   } catch (error: unknown) {
     const statusCode = (error as { statusCode?: number }).statusCode;
     if (statusCode === 410 || statusCode === 404) {
-      return false; // Subscription expired
+      return false;
     }
     console.error("Push notification error:", error);
     return false;
