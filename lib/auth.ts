@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import Resend from "next-auth/providers/resend";
 import { prisma } from "@/lib/prisma";
+import { magicLinkEmail } from "@/lib/email-template";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -9,6 +10,30 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     Resend({
       apiKey: process.env.RESEND_API_KEY,
       from: process.env.EMAIL_FROM || "BP Reversal <noreply@bpreversal.com>",
+      async sendVerificationRequest({ identifier: email, url, provider }) {
+        const { host } = new URL(url);
+        const { html, text } = magicLinkEmail({ url, host });
+
+        const res = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${provider.apiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: provider.from,
+            to: email,
+            subject: "Sign in to BP Reversal",
+            html,
+            text,
+          }),
+        });
+
+        if (!res.ok) {
+          const error = await res.text();
+          throw new Error(`Resend error: ${error}`);
+        }
+      },
     }),
   ],
   pages: {
@@ -17,13 +42,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   callbacks: {
     redirect({ url, baseUrl }) {
-      // After sign-in, go to /today (not back to /login)
       if (url.startsWith(baseUrl + "/login") || url === baseUrl + "/") {
         return baseUrl + "/today";
       }
-      // Allow relative URLs
       if (url.startsWith("/")) return baseUrl + url;
-      // Allow same-origin URLs
       if (url.startsWith(baseUrl)) return url;
       return baseUrl + "/today";
     },

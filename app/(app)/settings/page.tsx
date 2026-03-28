@@ -6,7 +6,8 @@ import { useUserStore } from "@/stores/user-store";
 import { Header } from "@/components/layout/header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { User, Clock, Bell, Heart, LogOut } from "lucide-react";
+import { User, Clock, Bell, Heart, LogOut, ShoppingCart } from "lucide-react";
+import Link from "next/link";
 
 export default function SettingsPage() {
   const { pushEnabled, setUser, updateSettings } =
@@ -154,6 +155,23 @@ export default function SettingsPage() {
             </button>
           </div>
         </Card>
+
+        {/* Shopping List */}
+        <Link href="/shopping-list">
+          <Card padding="lg">
+            <div className="flex items-center gap-3">
+              <ShoppingCart className="w-5 h-5 text-[#667085]" />
+              <div>
+                <h3 className="text-sm font-semibold text-[#1D2939]">
+                  Shopping List
+                </h3>
+                <p className="text-xs text-[#667085]">
+                  All supplements and foods for the protocol
+                </p>
+              </div>
+            </div>
+          </Card>
+        </Link>
 
         {/* Donate */}
         <Card padding="lg">
