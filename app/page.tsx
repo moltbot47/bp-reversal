@@ -153,7 +153,7 @@ export default function LandingPage() {
         </p>
         <p className="text-sm text-[#667085] mt-2">
           <a
-            href="https://buymeacoffee.com/bpreversal"
+            href="https://buymeacoffee.com/dbutler"
             target="_blank"
             rel="noopener noreferrer"
             className="text-[#EB9D2A] hover:underline"

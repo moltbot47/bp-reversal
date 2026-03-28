@@ -168,7 +168,7 @@ export default function SettingsPage() {
             coffee.
           </p>
           <a
-            href="https://buymeacoffee.com/bpreversal"
+            href="https://buymeacoffee.com/dbutler"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-sm font-medium text-[#EB9D2A] hover:underline"
