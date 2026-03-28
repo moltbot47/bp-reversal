@@ -1,13 +1,22 @@
 "use client";
 
-import { useState, Suspense } from "react";
-import { signIn } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
+import { useState, Suspense, useEffect } from "react";
+import { signIn, useSession } from "next-auth/react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Mail, ArrowRight, CheckCircle2 } from "lucide-react";
 
 function LoginContent() {
   const searchParams = useSearchParams();
+  const { status } = useSession();
+  const router = useRouter();
   const isVerify = searchParams.get("verify") === "true";
+
+  // Redirect authenticated users to /today
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.push("/today");
+    }
+  }, [status, router]);
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(isVerify);
@@ -15,7 +24,7 @@ function LoginContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await signIn("resend", { email, redirect: false });
+    await signIn("resend", { email, redirect: false, callbackUrl: "/today" });
     setSent(true);
     setLoading(false);
   };
