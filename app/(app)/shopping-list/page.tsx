@@ -141,7 +141,7 @@ export default function ShoppingListPage() {
                           {item.detail}
                         </p>
                         <a
-                          href={`https://www.amazon.com/s?k=${item.amazonSearch}`}
+                          href={`https://www.amazon.com/s?k=${item.amazonSearch}&tag=bpreversal-20`}
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
@@ -158,7 +158,10 @@ export default function ShoppingListPage() {
           );
         })}
 
-        {/* Disclaimer */}
+        {/* Disclaimers */}
+        <p className="text-xs text-[#667085] text-center px-4">
+          As an Amazon Associate, we earn from qualifying purchases.
+        </p>
         <p className="text-xs text-[#667085] text-center px-4 pb-4">
           These items are based on the research protocol. Always consult your
           doctor before starting new supplements, especially if on medication.
