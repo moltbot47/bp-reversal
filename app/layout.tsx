@@ -14,6 +14,20 @@ export const metadata: Metadata = {
   description:
     "Reverse high blood pressure naturally with a science-backed 90-day protocol. Track 21 daily habits across 4 pillars.",
   manifest: "/manifest.json",
+  openGraph: {
+    title: "BP Reversal — Reverse High Blood Pressure Naturally",
+    description:
+      "A free 90-day protocol targeting the 4 root causes of hypertension. 21 daily habits. Science-backed. Track your progress.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BP Reversal — 90-Day Protocol",
+    description:
+      "Free app to reverse high blood pressure naturally. 21 daily habits across 4 pillars.",
+    images: ["/og-image.png"],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
