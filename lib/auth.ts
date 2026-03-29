@@ -3,6 +3,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import Resend from "next-auth/providers/resend";
 import { prisma } from "@/lib/prisma";
 import { magicLinkEmail } from "@/lib/email-template";
+import { notifyNewUser } from "@/lib/notify-admin";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -54,6 +55,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = user.id;
       }
       return session;
+    },
+  },
+  events: {
+    createUser: async ({ user }) => {
+      // Notify admin when a brand new user signs up
+      if (user.email) {
+        await notifyNewUser(user.email);
+      }
     },
   },
 });
