@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CheckSquare, BarChart3, Heart, Settings } from "lucide-react";
+import { CheckSquare, CalendarDays, Heart, Settings } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/today", label: "Today", icon: CheckSquare },
-  { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
+  { href: "/history", label: "History", icon: CalendarDays },
   { href: "/bp-log", label: "BP Log", icon: Heart },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
