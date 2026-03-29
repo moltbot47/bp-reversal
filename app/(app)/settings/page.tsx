@@ -8,10 +8,13 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { User, Clock, Bell, Heart, LogOut, ShoppingCart } from "lucide-react";
 import Link from "next/link";
+import { subscribeToPush } from "@/lib/push-client";
+import { useToastStore } from "@/components/ui/toast-provider";
 
 export default function SettingsPage() {
   const { pushEnabled, setUser, updateSettings } =
     useUserStore();
+  const { addToast } = useToastStore();
   const [loading, setLoading] = useState(true);
   const [editName, setEditName] = useState("");
   const [editWakeTime, setEditWakeTime] = useState("06:00");
@@ -42,33 +45,16 @@ export default function SettingsPage() {
 
   const togglePush = async () => {
     if (!pushEnabled) {
-      // Request permission
-      if ("Notification" in window) {
-        const permission = await Notification.requestPermission();
-        if (permission === "granted") {
-          try {
-            const reg = await navigator.serviceWorker.ready;
-            const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-            if (!vapidKey || vapidKey === "placeholder") throw new Error("No VAPID key");
-            const subscription = await reg.pushManager.subscribe({
-              userVisibleOnly: true,
-              applicationServerKey: vapidKey,
-            });
-
-            await fetch("/api/push/subscribe", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ subscription }),
-            });
-
-            updateSettings({ pushEnabled: true });
-          } catch {
-            // Push subscription failed
-          }
-        }
+      const result = await subscribeToPush();
+      if (result.success) {
+        updateSettings({ pushEnabled: true });
+        addToast({ title: "Notifications enabled", variant: "success" });
+      } else {
+        addToast({ title: result.error || "Could not enable notifications" });
       }
     } else {
       updateSettings({ pushEnabled: false });
+      addToast({ title: "Notifications disabled" });
     }
   };
 

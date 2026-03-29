@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { User, Clock, Bell, ArrowRight, ArrowLeft, Smartphone } from "lucide-react";
+import { subscribeToPush } from "@/lib/push-client";
 
 type Step = "name" | "waketime" | "push";
 
@@ -27,28 +28,7 @@ export default function SignupPage() {
     });
 
     // Request push permission
-    if ("Notification" in window && "serviceWorker" in navigator) {
-      const permission = await Notification.requestPermission();
-      if (permission === "granted") {
-        try {
-          const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-          if (!vapidKey || vapidKey === "placeholder") throw new Error("No VAPID key");
-          const reg = await navigator.serviceWorker.ready;
-          const subscription = await reg.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: vapidKey,
-          });
-
-          await fetch("/api/push/subscribe", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ subscription }),
-          });
-        } catch {
-          // Push subscription failed, continue anyway
-        }
-      }
-    }
+    await subscribeToPush();
 
     setLoading(false);
     router.push("/today");
