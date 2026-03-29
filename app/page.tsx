@@ -7,28 +7,28 @@ const PILLARS = [
     label: "Vascular",
     color: "#EF4444",
     bg: "#FEE2E2",
-    desc: "Repair endothelial function and restore nitric oxide production",
+    desc: "Open up your blood vessels so blood flows easier — less pressure on your heart",
   },
   {
     icon: Brain,
     label: "Nervous",
     color: "#3B82F6",
     bg: "#DBEAFE",
-    desc: "Rebalance your autonomic nervous system through vagal activation",
+    desc: "Calm your stress response so your body stops keeping blood pressure high",
   },
   {
     icon: Droplets,
     label: "Blood",
     color: "#22C55E",
     bg: "#D1FAE5",
-    desc: "Optimize electrolyte ratios and restore proper hydration",
+    desc: "Fix the mineral balance in your blood so your body holds less extra water",
   },
   {
     icon: Leaf,
     label: "Kidney",
     color: "#A855F7",
     bg: "#F3E8FF",
-    desc: "Support renal sodium clearance and hormonal metabolism",
+    desc: "Help your kidneys flush out excess salt and fluid that raises pressure",
   },
 ];
 
